@@ -11,35 +11,25 @@ DwFluid2D fluid;
 PGraphics2D pg_fluid;
 
 Minim minim;
-AudioInput input;
+AudioPlayer input;
 BeatDetect beat;
 FFT fft;
-ColorPalette colorPalette1;
-ColorPalette colorPalette2;
+ColorPalette salmonColorPalette;
+ColorPalette violetteColorPalette;
+ColorPalette greyColorPalette;
+float songPositionMultiplier = 1000000;
 
 public void setup() {
   size(1024, 768, P3D);
-  
+
   background(0);
 
-  colorPalette1 = new ColorPalette(
-    Arrays.asList(new Color(74, 39, 37), 
-    new Color(214, 112, 107), 
-    new Color(138, 72, 69), 
-    new Color(150, 79, 75), 
-    new Color(112, 59, 56), 
-    new Color(256, 20, 30))); //easter egg :)
-
-  colorPalette2 =  new ColorPalette(
-    Arrays.asList(new Color(70, 36, 79), 
-    new Color(195, 99, 219), 
-    new Color(128, 65, 143), 
-    new Color(138, 70, 156), 
-    new Color(104, 53, 117), 
-    new Color(256, 0, 0))); //easter egg :)
+  salmonColorPalette = new SalmonColorPalette();
+  violetteColorPalette = new VioletteColorPalette();
+  greyColorPalette = new GreyColorPalette();
 
   minim = new Minim(this);
-  input = minim.getLineIn();
+  input = minim.loadFile("miche.mp3");
 
   beat = new BeatDetect(input.bufferSize(), input.sampleRate());
 
@@ -52,18 +42,19 @@ public void setup() {
   fluid = new DwFluid2D(context, width, height, 1);
 
   // some fluid parameters
-  fluid.param.dissipation_velocity = 0.70f;
-  fluid.param.dissipation_density  = 0.75f;
+  fluid.param.dissipation_velocity = 0.8f;
+  fluid.param.dissipation_density  = 0.9f;
 
   // adding data to the fluid simulation
   fluid.addCallback_FluiData(new  DwFluid2D.FluidData() {
     public void update(DwFluid2D fluid) {
       updateFluid(fluid);
     }
-  }
-  );
+  });
 
   pg_fluid = (PGraphics2D) createGraphics(width, height, P2D);
+
+  input.play();
 }
 
 
@@ -76,13 +67,13 @@ public void draw() {
 
   // clear render target
   pg_fluid.beginDraw();
-  pg_fluid.background(0); //clear screen
+  //pg_fluid.background(0); //clear screen
   pg_fluid.endDraw();
 
   // render fluid stuff
   // Ultima variabile è display_mode, dalla doc: 
   // 0 ... 1px points, 1 = sprite texture,  2 ... falloff points
-  fluid.renderFluidTextures(pg_fluid, 0);
+  fluid.renderFluidTextures(pg_fluid, 2);
 
   // display
   image(pg_fluid, 0, 0);
@@ -90,6 +81,22 @@ public void draw() {
   //go to next palette color
   goToNextColor();
 }
+
+void updateFluid(DwFluid2D fluid) {
+  Color currentPaletteColor = getCurrentColor();
+  float topFrequency = getTopTenFrequencies(fft)[0];
+  float px     = width/2-input.left.level()*10000+input.right.level()*10000;
+  float py     = height/2+topFrequency;
+  float vx     = 10000;
+  float multiplier = frameCount % 2 == 0 ? -1 : 1;
+  float vy = multiplier*int(map(input.position(), 0, input.length(), 0, height))*songPositionMultiplier;
+  fluid.addVelocity(px, py, 14, vx, vy);
+  fluid.addDensity (px, py, beat.isKick() ? random(10, 12) : random(5, 7), 
+    map(currentPaletteColor.getRed(), 0, 256, 0, 1), 
+    map(currentPaletteColor.getGreen(), 0, 256, 0, 1), 
+    map(currentPaletteColor.getBlue(), 0, 256, 0, 1), 1);
+}
+
 
 float[] getTopTenFrequencies(FFT fft) {
   fft.forward(input.mix);
@@ -103,46 +110,21 @@ float[] getTopTenFrequencies(FFT fft) {
 }
 
 Color getCurrentColor() {
-  return beat.isKick() ? colorPalette1.currentColor() : colorPalette2.currentColor();
-}
-
-void updateFluid(DwFluid2D fluid) {
-  Color currentPaletteColor = getCurrentColor();
-  float px     = width/2-input.left.level()*10000+input.right.level()*10000;
-  float py     = height/2+getTopTenFrequencies(fft)[(int)random(0, 10)];
-  float vx     = 0;
-  float vy     = 100;
-  fluid.addVelocity(px, py, 14, vx, vy);
-  fluid.addDensity (px, py, beat.isKick() ? random(20, 40) : random(1, 10), 
-    map(currentPaletteColor.getRed(), 0, 256, 0, 1), 
-    map(currentPaletteColor.getGreen(), 0, 256, 0, 1), 
-    map(currentPaletteColor.getBlue(), 0, 256, 0, 1), 1);
   if (beat.isKick()) {
-
-    Color upFlowColor = colorPalette1.getRandomColor();
-    for (int i=0; i<width; i+=10) {
-      fluid.addVelocity(i, height, 14, vx, -vy);
-      fluid.addDensity (i, height, 30, 
-        map(upFlowColor.getRed(), 0, 256, 0, 1), 
-        map(upFlowColor.getGreen(), 0, 256, 0, 1), 
-        map(upFlowColor.getBlue(), 0, 256, 0, 1), 1);
-    }
-
-    Color downFlowColor = colorPalette2.getRandomColor();
-    for (int i=0; i<width; i+=10) {
-      fluid.addVelocity(i, 0, 14, vx, vy);
-      fluid.addDensity (i, 0, 30, 
-        map(downFlowColor.getRed(), 0, 256, 0, 1), 
-        map(downFlowColor.getGreen(), 0, 256, 0, 1), 
-        map(downFlowColor.getBlue(), 0, 256, 0, 1), 1);
-    }
+    return salmonColorPalette.currentColor();
+  } else if (beat.isSnare()) {
+    return violetteColorPalette.currentColor();
+  } else {
+    return greyColorPalette.currentColor();
   }
-} 
+}
 
 void goToNextColor() {
   if (beat.isKick()) {
-    colorPalette1.nextColor();
+    salmonColorPalette.nextColor();
+  } else if (beat.isSnare()) {
+    violetteColorPalette.nextColor();
   } else {
-    colorPalette2.nextColor();
+    greyColorPalette.nextColor();
   }
 }
