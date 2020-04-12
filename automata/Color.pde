@@ -8,7 +8,7 @@ public class Color {
     this.red = red;
     this.green = green;
     this.blue = blue;
-    this.alpha = alpha;
+    this.alpha = 100;
   }
 
   public Color(float red, float green, float blue, float alpha) {

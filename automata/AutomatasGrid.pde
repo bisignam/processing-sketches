@@ -1,4 +1,4 @@
-public class AutomatasGrid { //<>// //<>//
+public class AutomatasGrid { //<>//
 
   private int gridWidth;
   private int gridHeight;
@@ -40,9 +40,10 @@ public class AutomatasGrid { //<>// //<>//
     pushMatrix();
     Color automataColor = automatas[automataX]
       [automataY].getColor();
-    fill(RGB, automataColor.getRed(), 
+    fill(automataColor.getRed(), 
       automataColor.getGreen(), 
-      automataColor.getBlue());
+      automataColor.getBlue(), 
+      automataColor.getAlpha());
     square(automataSize*automataX, automataSize*automataY, automataSize);
     popMatrix();
   }
@@ -52,35 +53,68 @@ public class AutomatasGrid { //<>// //<>//
     drawAutomatas();
   }
 
-  public List<Automaton> activateAutomaton(int automataX, int automataY, int loop, int numberOfGenerations) {
-    LinkedList<Automaton> automatonsSteps = new LinkedList<Automaton>();
+  public Map<Integer, List<Automaton>> computeActivatedAutomatons(int activationX, int activationY, int numberOfGenerations) {
+    Map<Integer, List<Automaton>> activatedAutomatonsMap = new HashMap<Integer, List<Automaton>>(); //<>//
+    internalActivateAutomaton(activationX, activationY, 1, numberOfGenerations, activatedAutomatonsMap); //<>//
+    return activatedAutomatonsMap; //<>//
+  }
+
+  private List<Automaton> internalActivateAutomaton(int automataX, int automataY, int step, 
+    int numberOfGenerations, Map<Integer, List<Automaton>> automatonsMap) {
     // System.out.println("Loop X Y "+loop +" "+automataX + " "+automataY);
-    if (loop == numberOfGenerations) {
+    List<Automaton> activatedAutomatons = new LinkedList<Automaton>();
+    if (step == numberOfGenerations) {
       //System.out.println("Reached number of generations. STOP");
-      return automatonsSteps;
+      automatonsMap.put(step, new LinkedList<Automaton>());
+      return new LinkedList<Automaton>();
     }
     if (automatas[automataX][automataY].isActive()) {
       //System.out.println("Already active");
-      return rule.alreadyActiveAutomaton(automataX, automataY);
+      List<Automaton> alreadyActiveList = rule.alreadyActiveAutomaton(automataX, automataY);
+      automatonsMap.put(step, alreadyActiveList);
+      return alreadyActiveList;
     }
+
+    //Activate the automaton
     Color activeAutomatonColor = new Color(255, 255, 255);
     automatas[automataX][automataY].setActive(true);
-    automatonsSteps.add(new Automaton(automataX, automataY, activeAutomatonColor));
+    Automaton activatedAutomaton = new Automaton(automataX, automataY, activeAutomatonColor);
+    activatedAutomatons.add(activatedAutomaton);
+    if (automatonsMap.get(step) == null) {
+      automatonsMap.put(step, new LinkedList<Automaton>());
+    }
+    automatonsMap.get(step).add(activatedAutomaton); //<>//
+
     //Manage X boundary
     if (automataX == 0 || automataX == gridWidth-1) {
-     return rule.reachWidthBound(automataX, automataY);
+      List<Automaton> xBoundReachedActivatedAutomatons = rule.reachWidthBound(automataX, automataY);
+      automatonsMap.put(step, xBoundReachedActivatedAutomatons);
+      return xBoundReachedActivatedAutomatons;
     }
     //Manage Y boundary
     if (automataY == 0 || automataY == gridHeight-1) {      
-      return rule.reachHeightBound(automataX, automataY);
+      List<Automaton> yBoundReachedActivatedAutomatons = rule.reachHeightBound(automataX, automataY);
+      automatonsMap.put(step, yBoundReachedActivatedAutomatons);
+      return yBoundReachedActivatedAutomatons;
     }
 
-    List<Automaton> nextAutomatons = rule.diffuse(automataX, automataY);
-    for (Automaton automaton : nextAutomatons) {
-      automatonsSteps.addAll(activateAutomaton(automaton.getX(), automaton.getY(), loop+1, numberOfGenerations));
+    List<Automaton> nextAutomatonsToActivate = rule.diffuse(automataX, automataY);
+    int automatonsAddedForStep = 1;
+    int stepForAutomatonAdd = step;
+    for (Automaton automatonToActivate : nextAutomatonsToActivate) {
+      if (automatonsAddedForStep >= rule.numberOfautomatonsForStep()) { //<>//
+        stepForAutomatonAdd++;
+        if(stepForAutomatonAdd >= numberOfGenerations) {
+          break;
+        }
+        automatonsAddedForStep = 1;
+      }
+      activatedAutomatons.addAll(internalActivateAutomaton(automatonToActivate.getX(), 
+        automatonToActivate.getY(), stepForAutomatonAdd, numberOfGenerations, automatonsMap));
+      automatonsAddedForStep++;
     }
 
-    return automatonsSteps;
+    return activatedAutomatons;
   }
 
   boolean isInitialized() {

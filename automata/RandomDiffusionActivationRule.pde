@@ -26,8 +26,12 @@ public class RandomDiffusionActivationRule implements AutomatonActivationRule {
     nextAutomatonsToActivate.add(new Automaton(automataX, randomY2 > automatasGrid.getGridHeight()-1 ? (int)random(automatasGrid.getGridHeight()) : randomY2));
     return nextAutomatonsToActivate;
   }
-  
-  public void setAutomatasGrid(AutomatasGrid automatasGrid){
+
+  public void setAutomatasGrid(AutomatasGrid automatasGrid) {
     this.automatasGrid = automatasGrid;
+  }
+
+  public int numberOfautomatonsForStep() {
+    return 1;
   }
 }

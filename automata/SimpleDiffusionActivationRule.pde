@@ -20,4 +20,8 @@ public class SimpleDiffusionActivationRule implements AutomatonActivationRule {
     nextAutomatonsToActivate.add(new Automaton(automataX, automataY - 1));
     return nextAutomatonsToActivate;
   }
+
+  public int numberOfautomatonsForStep() {
+    return 1;
+  }
 }

@@ -1,6 +1,7 @@
 public class ExplosionsActivationRule implements AutomatonActivationRule {
 
   private boolean alreadyExploded = false;
+  private int numberOfAutomatonsForStep;
   private Automaton explosionKernel;
 
   public List<Automaton> reachWidthBound(int automataX, int automataY) {
@@ -60,5 +61,9 @@ public class ExplosionsActivationRule implements AutomatonActivationRule {
   public void resetExplosion(int x, int y) {
     this.explosionKernel = new Automaton(x, y);
     this.alreadyExploded = false;
+  }
+  
+  public int numberOfautomatonsForStep(){
+    return 0;
   }
 }

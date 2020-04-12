@@ -23,7 +23,7 @@ class ColorPalette {
   }
   
   public Color getRandomColor(){
-    return colors.get((int)random(0, colors.size()-1)); 
+    return colors.get((int)random(0, /**not included**/colors.size())); 
   }
   
   public void reset() {
