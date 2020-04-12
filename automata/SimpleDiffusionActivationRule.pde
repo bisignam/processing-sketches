@@ -1,10 +1,10 @@
-public class SimpleDiffusionActivationRule implements AutomatonActivationRule {
+public class SimpleDiffusionActivationRule extends AutomatonActivationRule {
 
-  public List<Automaton> reachWidthBound(int automataX, int automataY) {
+  public List<Automaton> outsideWidthBound(int automataX, int automataY) {
     return new LinkedList();
   }
 
-  public List<Automaton> reachHeightBound(int automataX, int automataY) {
+  public List<Automaton> outsideHeightBound(int automataX, int automataY) {
     return new LinkedList();
   }  
 
@@ -19,9 +19,5 @@ public class SimpleDiffusionActivationRule implements AutomatonActivationRule {
     nextAutomatonsToActivate.add(new Automaton(automataX, automataY + 1));
     nextAutomatonsToActivate.add(new Automaton(automataX, automataY - 1));
     return nextAutomatonsToActivate;
-  }
-
-  public int numberOfautomatonsForStep() {
-    return 1;
   }
 }

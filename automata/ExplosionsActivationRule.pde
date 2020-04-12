@@ -1,14 +1,13 @@
-public class ExplosionsActivationRule implements AutomatonActivationRule {
+public class ExplosionsActivationRule extends AutomatonActivationRule {
 
   private boolean alreadyExploded = false;
-  private int numberOfAutomatonsForStep;
   private Automaton explosionKernel;
 
-  public List<Automaton> reachWidthBound(int automataX, int automataY) {
+  public List<Automaton> outsideWidthBound(int automataX, int automataY) {
     return new LinkedList();
   }
 
-  public List<Automaton> reachHeightBound(int automataX, int automataY) {
+  public List<Automaton> outsideHeightBound(int automataX, int automataY) {
     return new LinkedList();
   }  
 
@@ -50,7 +49,7 @@ public class ExplosionsActivationRule implements AutomatonActivationRule {
       } else if (explosionKernel.getX() == automataX && explosionKernel.getY() > automataY) {
         //go top
         nextAutomatonsToActivate.add(new Automaton(automataX, automataY - 1));
-      }  else if (explosionKernel.getX() == automataX && explosionKernel.getY() < automataY) {
+      } else if (explosionKernel.getX() == automataX && explosionKernel.getY() < automataY) {
         //go down
         nextAutomatonsToActivate.add(new Automaton(automataX, automataY + 1));
       }
@@ -58,12 +57,8 @@ public class ExplosionsActivationRule implements AutomatonActivationRule {
     return nextAutomatonsToActivate;
   }
 
-  public void resetExplosion(int x, int y) {
+  public void setupRule(int x, int y) {
     this.explosionKernel = new Automaton(x, y);
     this.alreadyExploded = false;
-  }
-  
-  public int numberOfautomatonsForStep(){
-    return 0;
   }
 }
