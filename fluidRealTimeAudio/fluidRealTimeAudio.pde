@@ -29,7 +29,7 @@ public void setup() {
   greyColorPalette = new GreyColorPalette();
 
   minim = new Minim(this);
-  input = minim.loadFile("miche.mp3");
+  input = minim.loadFile("track.mp3");
 
   beat = new BeatDetect(input.bufferSize(), input.sampleRate());
 
@@ -73,7 +73,7 @@ public void draw() {
   // render fluid stuff
   // Ultima variabile è display_mode, dalla doc: 
   // 0 ... 1px points, 1 = sprite texture,  2 ... falloff points
-  fluid.renderFluidTextures(pg_fluid, 2);
+  fluid.renderFluidTextures(pg_fluid, 0);
 
   // display
   image(pg_fluid, 0, 0);
