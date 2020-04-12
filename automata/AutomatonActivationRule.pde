@@ -14,6 +14,10 @@ public abstract class AutomatonActivationRule {
      //do nothing 
   }
   
+  public void cleanupRule(int automataX, int automataY){
+     //do nothing 
+  }
+  
   public void setGrid(AutomatasGrid grid){
     this.grid = grid;
   }

@@ -17,22 +17,7 @@ public class AutomatasGrid { //<>// //<>// //<>// //<>// //<>// //<>// //<>//
     automatas = new Automaton[gridWidth][gridHeight];
   }
 
-  public void setAndDrawAutomatas(List<Automaton> automatons) {
-    for (Automaton automaton : automatons) {
-      automatas[automaton.getX()][automaton.getY()] = automaton;
-    }
-    drawAutomatas();
-  }
-
-  private void drawAutomatas() {
-    for (int i=0; i<gridWidth; i+=1) {
-      for (int j=0; j<gridHeight; j+=1) {
-        drawAutomata(i, j);
-      }
-    }
-  }
-
-  public void drawAutomatas(ColorPalette colorPalette) {
+  public void resetToInitialState(ColorPalette colorPalette) {
     for (int i=0; i<gridWidth; i+=1) {
       for (int j=0; j<gridHeight; j+=1) {
         automatas[i][j] = new Automaton(i, j, colorPalette.currentColor());
@@ -66,6 +51,7 @@ public class AutomatasGrid { //<>// //<>// //<>// //<>// //<>// //<>// //<>//
     rule.setupRule(x, y);
     Map<Integer, List<Automaton>> activatedAutomatonsMap = new HashMap<Integer, List<Automaton>>();
     recursiveActivateAutomaton(x, y, 0, stepToCompute, activatedAutomatonsMap);
+    rule.cleanupRule(x, y);
     return activatedAutomatonsMap;
   }
 
@@ -105,7 +91,7 @@ public class AutomatasGrid { //<>// //<>// //<>// //<>// //<>// //<>// //<>//
   }
 
   private void recursiveActivateAutomaton(int x, int y, int currentStep, 
-    int targetStep, Map<Integer, List<Automaton>> automatonsMap) {
+    int targetStep, Map<Integer, List<Automaton>> automatonsMap) { //<>//
     if (currentStep > targetStep) {
       return;
     }
@@ -116,7 +102,7 @@ public class AutomatasGrid { //<>// //<>// //<>// //<>// //<>// //<>// //<>//
     }
     //Manage Y boundary
     if (y < 0 || y > gridHeight-1) {      
-      activateAutomatons(rule.outsideHeightBound(x, y), currentStep, automatonsMap);  //<>//
+      activateAutomatons(rule.outsideHeightBound(x, y), currentStep, automatonsMap); 
       return;
     }
     List<Automaton> nextAutomatonsToActivate = rule.diffuse(x, y);
