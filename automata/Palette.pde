@@ -2,28 +2,28 @@ import java.util.List;
 
 class ColorPalette {
 
-  private final List<Color> colors;
+  private final color[] colors;
   private int currentIndex = 0;
 
-  ColorPalette(List<Color> colors) {
+  ColorPalette(color[] colors) {
     this.colors = colors;
   }
   
-  public Color currentColor(){
-    return colors.get(currentIndex);   
+  public color currentColor(){
+    return colors[currentIndex];   
   }
 
-  public Color nextColor(){
-    if(currentIndex+1 >= colors.size()) {
+  public color nextColor(){
+    if(currentIndex+1 >= colors.length) {
       reset();
       return currentColor();
     }
     currentIndex++;
-    return colors.get(currentIndex); 
+    return currentColor(); 
   }
   
-  public Color getRandomColor(){
-    return colors.get((int)random(0, /**not included**/colors.size())); 
+  public color getRandomColor(){
+    return colors[(int)random(0, /**not included**/colors.length)]; 
   }
   
   public void reset() {

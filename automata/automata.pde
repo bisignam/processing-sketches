@@ -1,46 +1,68 @@
-import java.util.Arrays; //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>//
+import java.util.Arrays;
 import java.util.Map;
 import java.util.LinkedList;
 
 int automataSize = 20;
-AutomatasGrid automatasGrid;
+Grid grid;
 int currentStep = 0;
-int maxStep = 1;
+int maxStep = 1000;
 int activationX = 0;
 int activationY = 0;
-ColorPalette currentGridColorPalette = new SalmonColorPalette();
+ColorPalette gridColorPalette = new VioletteColorPalette();
+//Animation animation = new RandomAnimation();
+//Animation animation = new ExplosionAnimation();
+//Animation animation = new CubicAnimation();
+//Animation animation = new CrossAnimation();
+CellularAutomaton cellularAutomaton = new GameOfLife();
 
 public void setup() {
   size(1000, 1000);
   //fullScreen();
-  frameRate(15);
+  //frameRate(2);
   background(0);
   colorMode(RGB);
 
-  //Code for simple activation rule x +/- 1, y +/- 1
-  //automatasGrid = new AutomatasGrid(automataSize, new SimpleDiffusionActivationRule());
-
-  //Code for random activation Rule
-  //automatasGrid = new AutomatasGrid(automataSize, new RandomDiffusionActivationRule());
-
-  //Code for explosions activation rule
-  //automatasGrid = new AutomatasGrid(automataSize, new ExplosionsActivationRule());
-
-  //Code for cubic explosions activation rule
-  automatasGrid = new AutomatasGrid(automataSize, new CubicExplosionActivationRule());
-
-  stroke(0);
-  strokeWeight(0);
+  grid = new Grid(automataSize);
 }
 
 public void draw() {
-  if (currentStep == 0 || currentStep == maxStep-1) {
-    activationX = (int)random(automatasGrid.getGridWidth()-1);
-    activationY = (int)random(automatasGrid.getGridHeight()-1);
-    automatasGrid.resetToInitialState(currentGridColorPalette);
-    currentStep = 0;
-  } else {
-    automatasGrid.drawSteps(activationX, activationY, currentStep);
+  if (currentStep == maxStep) {
+    return;
   }
+  //grid.reset(color(255, 255, 0), color(0, 255, 0));
+      grid.reset(gridColorPalette);
+
+  initializeGridWithActiveCells();
+
+  if (currentStep == 0 || currentStep == maxStep) {
+    activationX = (int)random(grid.getGridWidth()-1);
+    activationY = (int)random(grid.getGridHeight()-1);
+
+    grid.reset(gridColorPalette);
+    //grid.reset(color(255, 255, 0), color(0, 255, 0));
+
+    //To be used in the case of cellular automaton usage
+    initializeGridWithActiveCells();
+
+    if (currentStep != 0) {
+      currentStep = 0;
+    }
+  }
+  grid.applyCellularAutomatonRule(cellularAutomaton, currentStep);
+  //grid.drawAnimationStep(animation, activationX, activationY, currentStep);
   currentStep++;
+}
+
+public void initializeGridWithActiveCells() {
+  //line
+  /** for (int i=25; i<30; i++) {
+   grid.activate(cellularAutomaton, i, 25);
+   }**/
+
+  //glider
+  grid.activate(cellularAutomaton, 25, 25);
+  grid.activate(cellularAutomaton, 27, 25);
+  grid.activate(cellularAutomaton, 26, 26);
+  grid.activate(cellularAutomaton, 27, 26);
+  grid.activate(cellularAutomaton, 26, 27);
 }
