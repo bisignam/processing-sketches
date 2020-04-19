@@ -2,10 +2,11 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.LinkedList;
 
-int automataSize = 20;
+int automataSize = 5;
 Grid grid;
-int currentStep = 0;
-int maxStep = 1000;
+int currentStep = 1;
+int maxStep = 140;
+//int maxStep = 152;
 int activationX = 0;
 int activationY = 0;
 ColorPalette gridColorPalette = new VioletteColorPalette();
@@ -13,7 +14,8 @@ ColorPalette gridColorPalette = new VioletteColorPalette();
 //Animation animation = new ExplosionAnimation();
 //Animation animation = new CubicAnimation();
 //Animation animation = new CrossAnimation();
-CellularAutomaton cellularAutomaton = new GameOfLife();
+//CellularAutomaton cellularAutomaton = new GameOfLife();
+Seeds cellularAutomaton = new Seeds();
 
 public void setup() {
   size(1000, 1000);
@@ -32,7 +34,7 @@ public void draw() {
   //grid.reset(color(255, 255, 0), color(0, 255, 0));
       grid.reset(gridColorPalette);
 
-  initializeGridWithActiveCells();
+  initializeGridWithActiveCells2();
 
   if (currentStep == 0 || currentStep == maxStep) {
     activationX = (int)random(grid.getGridWidth()-1);
@@ -42,7 +44,7 @@ public void draw() {
     //grid.reset(color(255, 255, 0), color(0, 255, 0));
 
     //To be used in the case of cellular automaton usage
-    initializeGridWithActiveCells();
+    initializeGridWithActiveCells2();
 
     if (currentStep != 0) {
       currentStep = 0;
@@ -53,16 +55,30 @@ public void draw() {
   currentStep++;
 }
 
-public void initializeGridWithActiveCells() {
+public void initializeGridWithActiveCells1() {
   //line
   /** for (int i=25; i<30; i++) {
    grid.activate(cellularAutomaton, i, 25);
    }**/
 
   //glider
-  grid.activate(cellularAutomaton, 25, 25);
-  grid.activate(cellularAutomaton, 27, 25);
-  grid.activate(cellularAutomaton, 26, 26);
-  grid.activate(cellularAutomaton, 27, 26);
-  grid.activate(cellularAutomaton, 26, 27);
+  grid.activate(cellularAutomaton, 10, 10);
+  grid.activate(cellularAutomaton, 12, 10);
+  grid.activate(cellularAutomaton, 11, 11);
+  grid.activate(cellularAutomaton, 12, 11);
+  grid.activate(cellularAutomaton, 11, 12);
+}
+
+public void initializeGridWithActiveCells2() {
+  //line
+  /** for (int i=25; i<30; i++) {
+   grid.activate(cellularAutomaton, i, 25);
+   }**/
+
+  //glider
+ // grid.activate(cellularAutomaton, 10, 10);
+ // grid.activate(cellularAutomaton, 12, 10);
+  grid.activate(cellularAutomaton, 11, 11);
+  grid.activate(cellularAutomaton, 12, 11);
+  grid.activate(cellularAutomaton, 11, 12);
 }
