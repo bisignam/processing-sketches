@@ -1,7 +1,0 @@
-squareSize: 10
-grayFilter: false
-threshold: 0.51
-thresholdForPainting: 100.0
-thresholdForOne: 40.0
-processedImageName: : 1.jpeg
-thresholdFilter: true
